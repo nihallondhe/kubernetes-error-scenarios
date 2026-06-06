@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-bad-oomkilled
+  namespace: three-tier-app
+spec:
+  containers:
+    - name: app
+      image: python:3.12-alpine
+      command: ["python", "-c"]
+      args:
+        - |
+          x = []
+          while True:
+              x.append("A" * 10**6)
+      resources:
+        requests:
+          memory: "32Mi"
+          cpu: "100m"
+        limits:
+          memory: "64Mi"
+          cpu: "200m"

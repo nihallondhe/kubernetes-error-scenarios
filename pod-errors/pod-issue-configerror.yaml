@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-bad-configerror
+  namespace: three-tier-app
+spec:
+  containers:
+    - name: app
+      image: nginx:alpine
+      envFrom:
+        - configMapRef:
+            name: config-that-does-not-exist

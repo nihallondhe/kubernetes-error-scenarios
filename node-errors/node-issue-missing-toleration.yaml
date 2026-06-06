@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: node-bad-taint
+  namespace: three-tier-app
+spec:
+  nodeSelector:
+    dedicated: special
+  containers:
+    - name: app
+      image: nginx:alpine

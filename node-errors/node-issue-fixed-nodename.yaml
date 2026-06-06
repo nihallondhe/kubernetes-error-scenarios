@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: node-bad-nodename
+  namespace: three-tier-app
+spec:
+  nodeName: node-that-does-not-exist
+  containers:
+    - name: app
+      image: nginx:alpine

@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgres-bad-crash
+  namespace: three-tier-app
+spec:
+  serviceName: postgres-bad-crash
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres-bad-crash
+  template:
+    metadata:
+      labels:
+        app: postgres-bad-crash
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:16
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 5432
+              name: postgres
+          env:
+            - name: POSTGRES_DB
+              value: broken_db
+            - name: POSTGRES_USER
+              value: broken_user
+            - name: POSTGRES_PASSWORD
+              value: ""
+          volumeMounts:
+            - name: postgres-bad-data
+              mountPath: /var/lib/postgresql/data
+  volumeClaimTemplates:
+    - metadata:
+        name: postgres-bad-data
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        storageClassName: local-path
+        resources:
+          requests:
+            storage: 1Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-bad-crash
+  namespace: three-tier-app
+spec:
+  selector:
+    app: postgres-bad-crash
+  ports:
+    - name: postgres
+      port: 5432
+      targetPort: 5432
+  type: ClusterIP

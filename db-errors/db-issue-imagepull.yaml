@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgres-bad-image
+  namespace: three-tier-app
+spec:
+  serviceName: postgres-bad-image
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres-bad-image
+  template:
+    metadata:
+      labels:
+        app: postgres-bad-image
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:this-tag-does-not-exist
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 5432
+              name: postgres
+          env:
+            - name: POSTGRES_DB
+              value: appdb
+            - name: POSTGRES_USER
+              value: appuser
+            - name: POSTGRES_PASSWORD
+              value: apppassword
+          volumeMounts:
+            - name: postgres-bad-image-data
+              mountPath: /var/lib/postgresql/data
+  volumeClaimTemplates:
+    - metadata:
+        name: postgres-bad-image-data
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        storageClassName: local-path
+        resources:
+          requests:
+            storage: 1Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-bad-image
+  namespace: three-tier-app
+spec:
+  selector:
+    app: postgres-bad-image
+  ports:
+    - name: postgres
+      port: 5432
+      targetPort: 5432
+  type: ClusterIP
