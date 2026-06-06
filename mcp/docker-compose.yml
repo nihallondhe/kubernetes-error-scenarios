@@ -1,0 +1,11 @@
+services:
+  kubernetes-mcp:
+    build: .
+    container_name: kubernetes-mcp
+    ports:
+      - "8000:8000"
+    volumes:
+      - /root/.kube/config:/root/.kube/config:ro
+    environment:
+      - KUBECONFIG=/root/.kube/config
+    restart: unless-stopped
